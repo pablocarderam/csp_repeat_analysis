@@ -9,6 +9,7 @@ import csv
 import sys
 
 from Bio import SeqIO
+from Bio.Seq import UndefinedSequenceError
 
 
 def classify_region(geo_loc_name, isolate_name="", reference_title="", journal=""):
@@ -573,7 +574,11 @@ def parse_genbank_to_csv(genbank_file, output_csv):
     # Parse GenBank file
     for record in SeqIO.parse(genbank_file, "genbank"):
         accession = record.id
-        sequence = str(record.seq)
+        try:
+            sequence = str(record.seq)
+        except UndefinedSequenceError as e:
+            sequence = ""
+            print(f"Error parsing sequence: {accession}: probably contig")
 
         # Extract geo_loc_name and isolate from features
         geo_loc_name = ""
